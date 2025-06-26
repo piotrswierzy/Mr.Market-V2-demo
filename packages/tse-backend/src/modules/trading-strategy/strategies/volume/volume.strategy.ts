@@ -483,7 +483,7 @@ export class VolumeStrategy implements Strategy {
       /* need more quote, so sell base for quote */
       const baseToSell = amountNeeded.div(price);
       if (baseToSell.gt(0)) {
-        const tempPrice = price * 1.1;
+        const tempPrice = price * 0.90;
         const amount = (baseToSell.mul(tempPrice).gte(1)) ? baseToSell : new Decimal(1).div(tempPrice);
         await exch.createOrder(pair, MarketOrderType.MARKET_ORDER, TradeSideType.SELL, amount, price);
       }
