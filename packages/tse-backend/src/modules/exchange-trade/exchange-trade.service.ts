@@ -142,9 +142,9 @@ export class ExchangeTradeService {
       exchangeName,
       userId,
     });
-    return await this.cancelAllOrdersOnExchange(exchangeInstance, pair, userId);
+    return await this.cancelAllOrdersOnExchange(exchangeInstance, pair);
   }
-  async cancelAllOrdersOnExchange(exchangeInstance: any, pair: string, userId: string) {
+  async cancelAllOrdersOnExchange(exchangeInstance: any, pair: string) {
 
     let openOrders: {
       id: string;

@@ -253,8 +253,7 @@ export class VolumeStrategy implements Strategy {
   private async cancelAllOrdersOnExchange(exchangeInstance: any, strategyEntity: VolumeStrategyData, pair: string,
   ) {
     await this.tradeService.cancelAllOrdersOnExchange(exchangeInstance, 
-      pair,
-    strategyEntity.userId);
+      pair);
   }
 
   async executeVolumeStrategy(data: VolumeStrategyData): Promise<void> {
@@ -266,12 +265,9 @@ export class VolumeStrategy implements Strategy {
       sideA,
       sideB,
       amountToTrade,
-      incrementPercentage,
       tradeIntervalSeconds,
       numTotalTrades,
-      pricePushRate,
       tradesExecuted = 0,
-      currentMakerPrice = null,
       lastTradingAttemptAt,
       clientId,
     } = data;
