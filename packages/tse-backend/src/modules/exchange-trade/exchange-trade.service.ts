@@ -138,10 +138,14 @@ export class ExchangeTradeService {
     userId: string,
   ) {
     const exchangeInstance =
-      await this.exchangeRegistryService.getExchangeByName({
-        exchangeName,
-        userId,
-      });
+    await this.exchangeRegistryService.getExchangeByName({
+      exchangeName,
+      userId,
+    });
+    return await this.cancelAllOrdersOnExchange(exchangeInstance, pair);
+  }
+  async cancelAllOrdersOnExchange(exchangeInstance: any, pair: string) {
+
     let openOrders: {
       id: string;
       datetime?: string | number;
