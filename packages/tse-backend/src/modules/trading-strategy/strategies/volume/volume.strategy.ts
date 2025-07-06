@@ -66,7 +66,6 @@ export class VolumeStrategy implements Strategy {
     this.logger.debug(
       `Amount of active volume strategies: ${strategies.length}`,
     );
-
     for (const strategy of strategies) {
       if (strategy.status === StrategyInstanceStatus.RUNNING) {
         const { tradeIntervalSeconds, lastTradingAttemptAt } = strategy;
@@ -158,6 +157,7 @@ export class VolumeStrategy implements Strategy {
     command: VolumeStrategyCommand,
   ): Promise<void> {
     const { userId, exchangeName, sideA, sideB } = command;
+    console.log(`userId: ${userId}, exchangeName: ${exchangeName}, sideA: ${sideA}, sideB: ${sideB}`)
     const pair = buildPair(sideA, sideB);
     const altPair = `${pair}:${sideB}`;
     await Promise.all([
@@ -299,7 +299,6 @@ export class VolumeStrategy implements Strategy {
       const [defaultAccount, additionalAccount] =
         await this.loadExchangeAccounts(exchangeName, userId);
       const orderBook = await defaultAccount.fetchOrderBook(pair);
-
       if (!orderBook.bids.length || !orderBook.asks.length) {
         return await this.pauseStrategyDueToOrderBook(id, pair);
       }
@@ -325,7 +324,7 @@ export class VolumeStrategy implements Strategy {
         bestBid,
         bestAsk
       );
-
+      
       await this.rebalance(
         makerExchange,
         takerExchange,
@@ -341,7 +340,6 @@ export class VolumeStrategy implements Strategy {
         tradeAmount,
         newMakerPrice,
       );
-      this.logger.log(`Best bid: ${bestBid}, best ask: ${bestAsk} for ${pair}`);
 
       await this.volumeService.updateStrategyAfterTrade(id, {
         tradesExecuted: tradesExecuted + 1,
@@ -450,6 +448,7 @@ export class VolumeStrategy implements Strategy {
       this.getFree(makerExchange, pair.split('/')[0], pair.split('/')[1]),
       this.getFree(takerExchange, pair.split('/')[0], pair.split('/')[1]),
     ]);
+
       /* maker side sufficient? */
       if (
         makerBalances.quote < tradeAmount.mul(midPrice).mul(1.01)
@@ -477,14 +476,14 @@ export class VolumeStrategy implements Strategy {
       if (amountNeeded.gt(0)) {
         //The minimum transaction volume cannot be less than：1USDT
         const tempPrice = price * 0.90;
-        const amount = (amountNeeded.mul(tempPrice).gte(1)) ? amountNeeded : new Decimal(1).div(tempPrice);
+        const amount = (amountNeeded.mul(tempPrice).gte(1)) ? amountNeeded : new Decimal(11.5).div(tempPrice);
         await exch.createOrder(pair, MarketOrderType.MARKET_ORDER, TradeSideType.BUY, amount, price);
     }} else {
       /* need more quote, so sell base for quote */
       const baseToSell = amountNeeded.div(price);
       if (baseToSell.gt(0)) {
         const tempPrice = price * 0.90;
-        const amount = (baseToSell.mul(tempPrice).gte(1)) ? baseToSell : new Decimal(1).div(tempPrice);
+        const amount = (baseToSell.mul(tempPrice).gte(1)) ? baseToSell : new Decimal(11.5).div(tempPrice);
         await exch.createOrder(pair, MarketOrderType.MARKET_ORDER, TradeSideType.SELL, amount, price);
       }
 
