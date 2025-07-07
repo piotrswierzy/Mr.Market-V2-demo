@@ -401,7 +401,7 @@ export class VolumeStrategy implements Strategy {
   }
 
   private calculateTradeAmount(baseAmount: Decimal): Decimal {
-    const randomFactor = 1 + (Math.random() * 0.1 - 0.05);
+    const randomFactor = 1 + (Math.random() * 0.1);
     return baseAmount.mul(randomFactor);
   }
 
@@ -449,6 +449,7 @@ export class VolumeStrategy implements Strategy {
       this.getFree(takerExchange, pair.split('/')[0], pair.split('/')[1]),
     ]);
 
+
       /* maker side sufficient? */
       if (
         makerBalances.quote < tradeAmount.mul(midPrice).mul(1.01)
@@ -476,14 +477,14 @@ export class VolumeStrategy implements Strategy {
       if (amountNeeded.gt(0)) {
         //The minimum transaction volume cannot be less than：1USDT
         const tempPrice = price * 0.90;
-        const amount = (amountNeeded.mul(tempPrice).gte(1)) ? amountNeeded : new Decimal(11.5).div(tempPrice);
+        const amount = (amountNeeded.mul(tempPrice).gte(10)) ? amountNeeded : new Decimal(11.5).div(tempPrice);
         await exch.createOrder(pair, MarketOrderType.MARKET_ORDER, TradeSideType.BUY, amount, price);
     }} else {
       /* need more quote, so sell base for quote */
       const baseToSell = amountNeeded.div(price);
       if (baseToSell.gt(0)) {
         const tempPrice = price * 0.90;
-        const amount = (baseToSell.mul(tempPrice).gte(1)) ? baseToSell : new Decimal(11.5).div(tempPrice);
+        const amount = (baseToSell.mul(tempPrice).gte(10)) ? baseToSell : new Decimal(11.5).div(tempPrice);
         await exch.createOrder(pair, MarketOrderType.MARKET_ORDER, TradeSideType.SELL, amount, price);
       }
 
