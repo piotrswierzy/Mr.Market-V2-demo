@@ -325,7 +325,7 @@ export class VolumeStrategy implements Strategy {
         bestAsk
       );
       
-      await this.rebalance(
+      const isRebalanceInProgress = await this.rebalance(
         makerExchange,
         takerExchange,
         pair,
@@ -333,6 +333,11 @@ export class VolumeStrategy implements Strategy {
         midPrice,
       );
 
+      /* if rebalance is in progress, do not place orders */
+      if (isRebalanceInProgress) {
+        return;
+      }
+      
       await this.placeOrders(
         pair,
         makerExchange,
@@ -443,12 +448,12 @@ export class VolumeStrategy implements Strategy {
     pair: string,
     tradeAmount: Decimal,
     midPrice: number,
-  ) {
+  ) : Promise<boolean> {
     const [makerBalances, takerBalances] = await Promise.all([
       this.getFree(makerExchange, pair.split('/')[0], pair.split('/')[1]),
       this.getFree(takerExchange, pair.split('/')[0], pair.split('/')[1]),
     ]);
-
+    let isRebalanced = false;
 
       /* maker side sufficient? */
       if (
@@ -456,13 +461,16 @@ export class VolumeStrategy implements Strategy {
       ) {
         const deficitBase = tradeAmount.mul(midPrice).sub(makerBalances.quote).div(midPrice);
         await this.executeRebalance(makerExchange, TradeSideType.SELL, pair, deficitBase, midPrice);
+        isRebalanced = true;
       } 
 
       /* taker side sufficient? */
       if (takerBalances.base < tradeAmount.mul(1.01)) {
         const deficitQuote = tradeAmount.sub(takerBalances.base);
         await this.executeRebalance(takerExchange, TradeSideType.BUY, pair, deficitQuote, midPrice);
+        isRebalanced = true;
       }
+    return isRebalanced;
   }
 
   private async executeRebalance(
