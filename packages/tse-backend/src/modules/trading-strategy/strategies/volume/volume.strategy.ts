@@ -484,15 +484,15 @@ export class VolumeStrategy implements Strategy {
       /* need more base, so buy base with quote */
       if (amountNeeded.gt(0)) {
         //The minimum transaction volume cannot be less than：1USDT
-        const tempPrice = price * 0.90;
-        const amount = (amountNeeded.mul(tempPrice).gte(10)) ? amountNeeded : new Decimal(11.5).div(tempPrice);
+        const tempPrice = price * 0.99;
+        const amount = (amountNeeded.mul(tempPrice).gte(10)) ? amountNeeded : new Decimal(10.5).div(tempPrice);
         await exch.createOrder(pair, MarketOrderType.MARKET_ORDER, TradeSideType.BUY, amount, price);
     }} else {
       /* need more quote, so sell base for quote */
       const baseToSell = amountNeeded.div(price);
       if (baseToSell.gt(0)) {
-        const tempPrice = price * 0.90;
-        const amount = (baseToSell.mul(tempPrice).gte(10)) ? baseToSell : new Decimal(11.5).div(tempPrice);
+        const tempPrice = price * 0.99;
+        const amount = (baseToSell.mul(tempPrice).gte(10)) ? baseToSell : new Decimal(10.5).div(tempPrice);
         await exch.createOrder(pair, MarketOrderType.MARKET_ORDER, TradeSideType.SELL, amount, price);
       }
 
